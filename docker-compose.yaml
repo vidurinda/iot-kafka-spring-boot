@@ -1,0 +1,93 @@
+version: '2'
+services:
+  iot-producer:
+    container_name: iot-producer-service
+    depends_on:
+      - kafka
+      - mongodb_container
+    build:
+      context: iot-producer
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - 8081:8081
+    environment:
+      KAFKA_HOST: kafka:9092
+    networks:
+      - ices-network
+
+  iot-consumer:
+    container_name: iot-consumer-service
+    depends_on:
+      - kafka
+      - mongodb_container
+    build:
+      context: iot-consumer
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - 8082:8082
+    environment:
+      KAFKA_HOST: kafka:9092
+      MONGO_HOST: mongodb_container
+    networks:
+      - ices-network
+
+  iot-visualizer:
+    container_name: iot-visualizerr-service
+    depends_on:
+      - mongodb_container
+    build:
+      context: iot-visualizer
+      dockerfile: ./docker/Dockerfile
+    ports:
+      - 8083:8083
+    environment:
+      MONGO_HOST: mongodb_container
+    networks:
+      - ices-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    restart: always
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - 22181:2181
+    networks:
+      - ices-network
+
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    restart: always
+    depends_on:
+      - zookeeper
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://localhost:29092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_LISTENER: PLAINTEXT://0.0.0.0:9092
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - ices-network
+
+  mongodb_container:
+    image: mongo:4.4.13
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: pass@123
+    ports:
+      - 27017:27017
+    volumes:
+      - mongodb_data_container:/data/db
+    networks:
+      - ices-network
+
+volumes:
+  mongodb_data_container:
+networks:
+  ices-network:

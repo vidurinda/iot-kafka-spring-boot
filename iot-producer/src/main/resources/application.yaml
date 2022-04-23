@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: iot-producer
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:}
+server:
+  port: 8081
+iot:
+  kafka:
+    topic:
+      numOfPartition: 3
+      numOfReplication: 1
+      sensorTopic: sensor-data-topic

@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: iot-consumer
+  kafka:
+    bootstrap-servers: ${KAFKA_HOST:}
+    consumer:
+      group-id: sensor-consumer
+      auto-offset-reset: earliest
+  data:
+    mongodb:
+      host: ${MONGO_HOST:}
+      port: 27017
+      database: sensor-data
+      username: root
+      password: pass@123
+      authentication-database: admin
+server:
+  port: 8082
+iot:
+  kafka:
+    topic:
+      numOfPartition: 3
+      numOfReplication: 1
+      sensorTopic: sensor-data-topic

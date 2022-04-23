@@ -1,0 +1,19 @@
+spring:
+  application:
+    name: iot-visualizer
+  data:
+    mongodb:
+      host: ${MONGO_HOST:}
+      port: 27017
+      database: sensor-data
+      username: root
+      password: pass@123
+      authentication-database: admin
+      auto-index-creation: true
+server:
+  port: 8083
+jwt:
+  secret: sensorapp
+filter:
+  exclude:
+    urls: /auth,/register
